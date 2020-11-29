@@ -22,12 +22,13 @@ namespace ReadMangaDownloader
             {
                 Console.WriteLine("Введите url адресс: https://readmanga.live/*");
                 var url = Console.ReadLine();
+                
                 try
                 {
                     Console.WriteLine("Загрузка...");
                     manga = new MangaInfo(url);
                     manga.GetChapters();
-
+                        
                     while (true)
                     {
                             Console.Write($"\n{url}\\");
@@ -43,9 +44,9 @@ namespace ReadMangaDownloader
                                     $"\ncount chapters: Количество глав" +
                                     $"\nlast chapter info: Информация по последней главе" +
                                     $"\nchapter [number] info: Информация по главе" +
-                                    $"\ndownload chapters [directory]: Загрузить главы в директорию" +
-                                    $"\ndownload chapter [number] [directory]: Загрузить главу [number] в директорию" +
-                                    $"\ndownload chapters [from] - [to] [directory]: Загрузить главы от [from] до [to] в директорию" +
+                                    $"\ndownload [directory]: Загрузить главы в директорию" +
+                                    $"\ndownload [number] [directory]: Загрузить главу [number] в директорию" +
+                                    $"\ndownload [from] - [to] [directory]: Загрузить главы от [from] до [to] в директорию" +
                                     $"\n");
                             }
                             if (command == "info")
@@ -63,47 +64,26 @@ namespace ReadMangaDownloader
                                 foreach (MangaChapter chapter in manga.Chapters)
                                     Console.WriteLine($"({++index}) {chapter.Name}");
                             }
-                            else if ((mcommand = Regex.Match(command, @"^^download chapters\s+(\d+)\s*-\s*(\d+)\s+([A-Za-z]:\\.*)")).Success)
+                            else if ((mcommand = Regex.Match(command, @"^download(\s+(\d+)(\s*-\s*(\d+))?)?\s*([A-Za-z]:\\.*)?$")).Success)
                             {
-                                int from = int.Parse(mcommand.Groups[1].Value);
-                                int to = int.Parse(mcommand.Groups[2].Value);
-                                string directory = mcommand.Groups[3].Value;
+                                int from = int.Parse(string.IsNullOrWhiteSpace(mcommand.Groups[2].Value) == true?
+                                    "1": mcommand.Groups[2].Value);
+                                int to;
+                                
+                                if (string.IsNullOrWhiteSpace(mcommand.Groups[4].Value))
+                                {
+                                    to = string.IsNullOrWhiteSpace(mcommand.Groups[2].Value) == true ? manga.Chapters.Count : from;
+                                }
+                                else
+                                    to = int.Parse(mcommand.Groups[4].Value);
 
+                                string directory = mcommand.Groups[5].Value??string.Empty;
+                                
                                 try 
                                 {
-                                    Console.WriteLine($"Загрузка глав от {from} до {to} в директорию {directory}!");
+                                    Console.WriteLine($"Загрузка глав {from} - {to} в директорию " +
+                                        $"{(directory == string.Empty ? Environment.CurrentDirectory: directory)}!");
                                     manga.SaveFromTo(from-1, to-1, directory, 5);
-                                    Console.WriteLine($"Главы загружены");
-                                }
-                                catch (Exception e)
-                                {
-                                    Console.WriteLine(e.Message);
-                                }
-                            }
-                            else if ((mcommand = Regex.Match(command, @"^download chapter\s+(\d+)\s+([A-Za-z]:\\.*)$")).Success)
-                            {
-                                int from = int.Parse(mcommand.Groups[1].Value);
-                                string directory = mcommand.Groups[2].Value;
-
-                                try
-                                {
-                                    Console.WriteLine($"Загрузка главы {from} в директорию {directory}!");
-                                    manga.SaveFromTo(from-1, from-1, directory, 5);
-                                    Console.WriteLine($"Глава загружена");
-                                }
-                                catch (Exception e)
-                                {
-                                    Console.WriteLine(e.Message);
-                                }
-                            }
-                            else if ((mcommand = Regex.Match(command, @"^download chapters\s+([A-Za-z]:\\.*)$")).Success)
-                            {
-                                string directory = mcommand.Groups[1].Value;
-
-                                try
-                                {
-                                    Console.WriteLine($"Загрузка глав в директорию {directory}!");
-                                    manga.Save(directory, 5);
                                     Console.WriteLine($"Главы загружены");
                                 }
                                 catch (Exception e)

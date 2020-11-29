@@ -121,8 +121,9 @@ namespace ReadMangaDownloader
 
         public void SaveFromTo(int from, int to, string directory, int tryDownloadCounts = 1)
         {
-            if (directory[directory.Length - 1] != '\\')
-                directory += '\\';
+            if (directory.Length!=0)
+                if (directory[directory.Length - 1] != '\\')
+                    directory += '\\';
             directory += $"{Name}\\";
 
             foreach (MangaChapter chapter in FromToChapters(from, to))
@@ -149,7 +150,7 @@ namespace ReadMangaDownloader
             Name = name;
         }
 
-        public void GetPages()
+        public void InitPages()
         {
             Pages = new List<ChapterPage>();
             WebClient client = new WebClient();
@@ -178,7 +179,7 @@ namespace ReadMangaDownloader
         public void Save(string directory, int tryDownloadCounts = 1)
         {
             if (Pages == null)
-                GetPages();
+                InitPages();
 
             if (directory[directory.Length - 1] != '\\')
                 directory += '\\';
