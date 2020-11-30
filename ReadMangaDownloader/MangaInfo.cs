@@ -22,10 +22,10 @@ namespace ReadMangaDownloader
             get => _url;
             private set 
             {
-                if (Regex.IsMatch(value, @"https://readmanga.live/.*"))
+                if (Regex.IsMatch(value, @"https://readmanga.live/.+"))
                     _url = value;
                 else
-                    throw new ArgumentException("Некоректый "+ nameof(Url));
+                    throw new ArgumentException("Некорректный URL адрес");
             }
         }
         public List<MangaChapter> Chapters { get; set; }
@@ -43,7 +43,7 @@ namespace ReadMangaDownloader
             }
             catch
             {
-                throw new ArgumentException("Неккоректный url адресс");
+                throw new ArgumentException("Некорректный URL адрес");
             }
             GetMangaInfo();
         }
@@ -53,7 +53,7 @@ namespace ReadMangaDownloader
             int indexOfBeginTableChapters;
             int indexOfEndTableChapters;
             if ((indexOfBeginTableChapters = _urlString.IndexOf("<div class=\"leftContent\"")) == -1)
-                throw new ArgumentException("Неккоректный url адресс");
+                throw new ArgumentException("Некорректный URL адрес");
             indexOfEndTableChapters = _urlString.IndexOf("</div>", indexOfBeginTableChapters);
 
             string table_chapters = _urlString.Substring(indexOfBeginTableChapters, indexOfEndTableChapters - indexOfBeginTableChapters);
@@ -76,14 +76,14 @@ namespace ReadMangaDownloader
         public void GetChapters()
         {
             if (string.IsNullOrWhiteSpace(Url))
-                throw new ArgumentException("Неккоректный url адресс");
+                throw new ArgumentException("Некорректный URL адрес");
 
-            Chapters= new List<MangaChapter>();
+            Chapters = new List<MangaChapter>();
 
             int indexOfBeginTableChapters;
             int indexOfEndTableChapters;
             if ((indexOfBeginTableChapters = _urlString.IndexOf("table table-hover")) == -1)
-                throw new ArgumentException("Неккоректный url адресс");
+                throw new ArgumentException("Некорректный URL адрес");
             indexOfEndTableChapters = _urlString.IndexOf("</table>", indexOfBeginTableChapters);
 
             string table_chapters = _urlString.Substring(indexOfBeginTableChapters, indexOfEndTableChapters - indexOfBeginTableChapters);
