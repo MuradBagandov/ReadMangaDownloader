@@ -17,7 +17,6 @@ namespace ReadMangaDownloader
             {"https://readmanga.live", @"https:\/\/readmanga\.live\/.+" },
             {"https://mintmanga.live", @"https:\/\/mintmanga\.live\/.+" },
             {"http://allhentai.ru", @"http:\/\/allhentai.ru\/.+"}
-
         };
 
         private string _useRootUrl;
