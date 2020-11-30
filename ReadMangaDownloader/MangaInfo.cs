@@ -12,6 +12,15 @@ namespace ReadMangaDownloader
 {
     public class MangaInfo
     {
+        private Dictionary<string, string> _rootUrls = new Dictionary<string, string>()
+        {
+            {"https://readmanga.live", @"https:\/\/readmanga\.live\/.+" },
+            {"https://mintmanga.live", @"https:\/\/mintmanga\.live\/.+" },
+            {"http://allhentai.ru", @"http:\/\/allhentai.ru\/.+"}
+
+        };
+
+        private string _useRootUrl;
         public string Name { get; private set; }
         public string Names { get; private set; }
         public string Description { get; private set; }
@@ -22,10 +31,16 @@ namespace ReadMangaDownloader
             get => _url;
             private set 
             {
-                if (Regex.IsMatch(value, @"https://readmanga.live/.+"))
-                    _url = value;
-                else
-                    throw new ArgumentException("Некорректный URL адрес");
+                foreach (string item in _rootUrls.Keys)
+                {
+                    if (Regex.IsMatch(value, _rootUrls[item]))
+                    {
+                        _url = value;
+                        _useRootUrl = item;
+                        return;
+                    }     
+                }
+                throw new ArgumentException("Некорректный URL адрес");     
             }
         }
         public List<MangaChapter> Chapters { get; set; }
@@ -103,7 +118,7 @@ namespace ReadMangaDownloader
 
                 var r = Regex.Match(table_chapter, @"<a href=.(.*). title.*>([\w\W]*)\n[\w\W]*<\/a>");
 
-                chapter.url = $"https://readmanga.live{r.Groups[1].Value}";
+                chapter.url = $"{_useRootUrl}{r.Groups[1].Value}";
                 chapter.name = Regex.Replace(r.Groups[2].Value, @"[^A-Za-zА-Яа-я0-9-_'()#$&!@^]+", " ").Trim();
                 Chapters.Add(new MangaChapter(chapter.url, chapter.name));
             }
