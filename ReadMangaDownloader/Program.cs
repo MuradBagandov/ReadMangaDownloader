@@ -44,9 +44,9 @@ namespace ReadMangaDownloader
 
         private static List<string> _webSites = new List<string>()
         {
-            "readmanga.live",
-            "mintmanga.live", 
-            "allhentai.ru"
+            "https://readmanga.live",
+            "https://mintmanga.live",
+            "http://allhentai.ru"
         };
 
         private static List<Command> _titleCommands = new List<Command>()
@@ -159,7 +159,7 @@ namespace ReadMangaDownloader
                 if (int.TryParse(webSiteIndex, out int select_index) 
                     && select_index <= _webSites.Count && select_index >= 1)
                 {
-                    _rootUrl = "https://" + _webSites[select_index - 1] + "/";
+                    _rootUrl = _webSites[select_index - 1] + "/";
                     Console.Title = _webSites[select_index - 1]; ;
                 }
                 else
