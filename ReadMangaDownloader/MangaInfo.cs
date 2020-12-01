@@ -57,7 +57,7 @@ namespace ReadMangaDownloader
             }
             catch
             {
-                throw new ArgumentException("Некорректный URL адрес");
+                throw new ArgumentException("URL является недопустимым или произошла ошибка при загрузке ресурса.");
             }
             GetMangaInfo();
         }
@@ -67,7 +67,7 @@ namespace ReadMangaDownloader
             int indexOfBeginTableChapters;
             int indexOfEndTableChapters;
             if ((indexOfBeginTableChapters = _urlString.IndexOf("<div class=\"leftContent\"")) == -1)
-                throw new ArgumentException("Некорректный URL адрес");
+                throw new ArgumentException("Указанный URL адрес не является страницей произведения");
             indexOfEndTableChapters = _urlString.IndexOf("</div>", indexOfBeginTableChapters);
 
             string table_chapters = _urlString.Substring(indexOfBeginTableChapters, indexOfEndTableChapters - indexOfBeginTableChapters);
@@ -90,14 +90,14 @@ namespace ReadMangaDownloader
         public void GetChapters()
         {
             if (string.IsNullOrWhiteSpace(Url))
-                throw new ArgumentException("Некорректный URL адрес");
+                throw new ArgumentException("Не указан URL адрес");
 
             Chapters = new List<MangaChapter>();
 
             int indexOfBeginTableChapters;
             int indexOfEndTableChapters;
             if ((indexOfBeginTableChapters = _urlString.IndexOf("table table-hover")) == -1)
-                throw new ArgumentException("Некорректный URL адрес");
+                throw new ArgumentException("Указанный URL адрес не содержит список глав");
             indexOfEndTableChapters = _urlString.IndexOf("</table>", indexOfBeginTableChapters);
 
             string table_chapters = _urlString.Substring(indexOfBeginTableChapters, indexOfEndTableChapters - indexOfBeginTableChapters);
@@ -118,7 +118,7 @@ namespace ReadMangaDownloader
                 var r = Regex.Match(table_chapter, @"<a href=.(.*). title.*>([\w\W]*)\n[\w\W]*<\/a>");
 
                 chapter.url = $"{_useRootUrl}{r.Groups[1].Value}";
-                chapter.name = Regex.Replace(r.Groups[2].Value, @"[^A-Za-zА-Яа-я0-9-_'()#$&!@^]+", " ").Trim();
+                chapter.name = Regex.Replace(r.Groups[2].Value, @"[\n\s]+", " ").Trim(); ;
                 Chapters.Add(new MangaChapter(chapter.url, chapter.name));
             }
 
@@ -129,6 +129,15 @@ namespace ReadMangaDownloader
         {
             for (int i = from; i <=to; i++)
             {
+                MangaChapter chapter;
+                try
+                {
+                    chapter = Chapters[i];
+                }
+                catch
+                {
+                    throw new ArgumentException("Индекс или диапозон находиться за пределом диапозона доступных глав");
+                }
                 yield return Chapters[i];
             }
         }
@@ -138,7 +147,9 @@ namespace ReadMangaDownloader
             if (directory.Length!=0)
                 if (directory[directory.Length - 1] != '\\')
                     directory += '\\';
-            directory += $"{Name}\\";
+            string _name = Regex.Replace(Name, @"[^A-Za-zА-Яа-я0-9-_'()#$&!@^]", " ");
+            directory += $"{_name}\\";
+
 
             foreach (MangaChapter chapter in FromToChapters(from, to))
                 chapter.Save(directory, tryDownloadCounts);
@@ -179,7 +190,7 @@ namespace ReadMangaDownloader
 
             string stringURLs = Regex.Match(url_string, @"\[(\[.*\])\]").Groups[1].Value;
             if (string.IsNullOrEmpty(stringURLs))
-                throw new ArgumentException("Неккоректный url адрес");
+                throw new ArgumentException("Указанный URL адрес не содержит страниц");
             var r = Regex.Matches(stringURLs, "\\[[^\\[]*\\]");
 
             Match pageUrlMatch;
@@ -197,7 +208,9 @@ namespace ReadMangaDownloader
 
             if (directory[directory.Length - 1] != '\\')
                 directory += '\\';
-            directory += $"{Name}\\";
+
+            string _name = Regex.Replace(Name, @"[^A-Za-zА-Яа-я0-9-_'()#$&!@^]", " ");
+            directory += $"{_name}\\";
 
             foreach (ChapterPage page in Pages)
                 page.Save(directory, tryDownloadCounts);
