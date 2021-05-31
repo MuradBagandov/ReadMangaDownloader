@@ -52,7 +52,7 @@ namespace ReadMangaDownloader
         private static List<Command> _titleCommands = new List<Command>()
         {
             { new Command("info", "Информация о произведении",
-                new Regex(@"\s*info\s*", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+                new Regex(@"^\s*info\s*", RegexOptions.IgnoreCase | RegexOptions.Compiled),
                 (manga, match)=>
                 {
                     ShowMessageLine($"{manga.Names}: {manga.Name}\nОписание:\n" +
@@ -164,7 +164,7 @@ namespace ReadMangaDownloader
                 }
                 else
                 {
-                    ShowMessage("Неккоректный ввод!\n", ConsoleColor.Yellow);
+                    ShowMessage("Неккоректный ввод!\n", ConsoleColor.Red);
                     continue;
                 }
 
@@ -227,7 +227,7 @@ namespace ReadMangaDownloader
                                 }
                                 if (!isTitleCommand)
                                 {
-                                    ShowMessage("Неизвестная комманда!\n", ConsoleColor.Yellow);
+                                    ShowMessage("Неизвестная комманда!\n", ConsoleColor.Red);
                                     ShowCommandsList();
                                 }
                             }
@@ -260,7 +260,7 @@ namespace ReadMangaDownloader
 
             foreach (Command item in _titleCommands)
             {
-                ShowMessageLine($"{item.Name}", ConsoleColor.Yellow);
+                ShowMessageLine($"{item.Name} ", ConsoleColor.Yellow);
                 ShowMessage($"{item.Description}");
             }
         }
